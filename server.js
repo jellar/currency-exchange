@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { getRates, getSymbols } = require('./lib/fixer-service');
+const { getRates, getSymbols, getHistoricalRate } = require('./lib/fixer-service');
 const { convertCurrency } = require('./lib/free-currency-service');
 
 const express = require('express');
@@ -39,6 +39,18 @@ app.get('/api/rates', async(req,res)=>{
 app.get('/api/symbols', async(req,res) => {
     try{
         const data = await getSymbols();
+        res.setHeader('Content-Type', 'application/json');
+        res.send(data);
+    }
+    catch(error){
+        errorHandler(error, req, res);
+    }
+});
+
+app.post('/api/historical', async(req,res) => {
+    try{
+        const { date } = req.body;
+        const data = await getHistoricalRate(date);
         res.setHeader('Content-Type', 'application/json');
         res.send(data);
     }
